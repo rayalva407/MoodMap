@@ -1,6 +1,12 @@
+const map = L.map('map').setView([30, 0], 2);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
+const err = document.querySelector("#error");
+const moodIcons = document.querySelectorAll(".mood-icon");
+let currentLocation = null;
+
 function getLocation() {
     if (navigator.geolocation) {
-      const location = navigator.geolocation.getCurrentPosition(success, error);
+      navigator.geolocation.getCurrentPosition(success, error);
     }
     else {
       err.innerHTML = "Geolocation is not supported by this browser.";
@@ -10,11 +16,8 @@ function getLocation() {
 }
 
 function success(position) {
-    let location = [position.coords.latitude, position.coords.longitude]
-
-    map.setView(location, 17);
-
-    return location
+    currentLocation = [position.coords.latitude, position.coords.longitude]
+    map.setView(currentLocation, 17);
 }
   
 function error() {
@@ -23,20 +26,19 @@ function error() {
 
 // ---------------------------------------------------------------------------------------------
 
+getLocation();
 
-const map = L.map('map').setView([30, 0], 2);
-const err = document.querySelector("#error");
+moodIcons.forEach((item) => {
+  
+  item.addEventListener('click', () => {
+    const iconPath = item.getAttribute("src");
+    const icon = L.icon({
+      iconUrl: iconPath,
+      iconSize: [20, 20]
+    });
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
+    L.marker(currentLocation, {icon: icon}).addTo(map);
+  });
 
-const currentLocation = getLocation();
-
-const myIcon = L.icon({
-    iconUrl: "./assets/icons8-happy-face-48.png",
-    iconSize: [20, 20]
-});
-
-L.marker([50.505, 30.57], {icon: myIcon}).addTo(map);
-
-
+})
 
