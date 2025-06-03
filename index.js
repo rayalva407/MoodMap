@@ -53,7 +53,7 @@ moodIcons.forEach((item) => {
     const descriptionInput = document.createElement('textarea');
     const submitButton = document.createElement("button");
     const bodyElement = document.querySelector('body');
-    const moodDescription = descriptionTitle.textContent;
+    let moodDescription = "";
 
     submitButton.textContent = "Submit";
     descriptionTitle.innerText = "Tell us why you are feeling this way";
@@ -62,7 +62,9 @@ moodIcons.forEach((item) => {
     formDiv.appendChild(descriptionInput);
     formDiv.appendChild(submitButton);
 
-
+    descriptionInput.addEventListener("input", (e) => {
+      moodDescription = e.target.value;
+    })
     
     submitButton.addEventListener('click', () => {
       L.marker(currentLocation, {icon: icon}).addTo(map);
@@ -72,7 +74,7 @@ moodIcons.forEach((item) => {
         body: JSON.stringify({
           latitude: currentLocation[0],
           longitude: currentLocation[1],
-          moodDescription: moodDescription
+          mood_description: moodDescription
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8"
