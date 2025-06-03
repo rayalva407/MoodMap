@@ -5,6 +5,10 @@ body {
     align-items: center;
 }
 
+#error {
+    color: red;
+}
+
 #map {
     height:500px;
     width: 90%;
@@ -17,6 +21,7 @@ body {
     justify-content: center;
 }
 
-#error {
-    color: red;
+#form-div {
+    display: flex;
+    flex-direction: column;
 }
