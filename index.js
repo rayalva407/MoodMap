@@ -2,7 +2,8 @@ const map = L.map('map').setView([30, 0], 4);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
 const err = document.querySelector("#error");
 const moodIcons = document.querySelectorAll(".mood-icon");
-let currentLocation = null;
+let currentLocation;
+let moods;
 
 function getLocation() {
   
@@ -27,9 +28,25 @@ function error(error) {
   err.innerHTML = "Please allow location permission to add a marker to the mood map";
 }
 
+function getMoods() {
+  
+  fetch("http://localhost:3000/moods")
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(mood => {
+      console.log(mood)
+    })
+  })
+}
+
 // ---------------------------------------------------------------------------------------------
 
-getLocation();
+document.addEventListener("DOMContentLoaded", (event) => {
+  getMoods();
+  getLocation();
+})
+
+
 
 moodIcons.forEach((item) => {
   
