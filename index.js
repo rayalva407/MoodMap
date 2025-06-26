@@ -3,7 +3,11 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, att
 const err = document.querySelector("#error");
 const moodIcons = document.querySelectorAll(".mood-icon");
 let currentLocation;
-let moods;
+
+let moods = {
+  "happy": "assets/icons8-happy-face-48.png",
+  "sad": "assets/icons8-crying-48.png"
+}
 
 function getLocation() {
   
@@ -17,14 +21,12 @@ function getLocation() {
   return location;
 }
 
-function success(position) {
-  
+function success(position) {  
   currentLocation = [position.coords.latitude, position.coords.longitude]
   map.setView(currentLocation, 17);
 }
   
 function error(error) {
-  console.log(error)
   err.innerHTML = "Please allow location permission to add a marker to the mood map";
 }
 
@@ -34,7 +36,7 @@ function getMoods() {
   .then(res => res.json())
   .then(data => {
     data.forEach(mood => {
-      console.log(mood)
+      L.marker([mood.latitude, mood.longitude]).addTo(map);
     })
   })
 }
@@ -52,6 +54,7 @@ moodIcons.forEach((item) => {
   
   item.addEventListener('click', () => {
     const iconPath = item.getAttribute("src");
+    const currentMood = Object.keys(moods).find((key) => moods[key] === iconPath);
     const icon = L.icon({
       iconUrl: iconPath,
       iconSize: [20, 20]
@@ -89,6 +92,7 @@ moodIcons.forEach((item) => {
       fetch("http://localhost:3000/moods", {
         method: "POST",
         body: JSON.stringify({
+          mood_name: currentMood,
           latitude: currentLocation[0],
           longitude: currentLocation[1],
           mood_description: moodDescription
