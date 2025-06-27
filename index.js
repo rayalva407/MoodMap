@@ -36,7 +36,11 @@ function getMoods() {
   .then(res => res.json())
   .then(data => {
     data.forEach(mood => {
-      L.marker([mood.latitude, mood.longitude]).addTo(map);
+      const icon = L.icon({
+        iconUrl: moods[mood.mood_name],
+        iconSize: [20, 20]
+      });
+      L.marker([mood.latitude, mood.longitude], { icon: icon }).addTo(map);
     })
   })
 }
