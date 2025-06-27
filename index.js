@@ -1,12 +1,24 @@
 const map = L.map('map').setView([30, 0], 4);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
 const err = document.querySelector("#error");
-const moodIcons = document.querySelectorAll(".mood-icon");
+const moodSection = document.querySelector("#mood-section")
 let currentLocation;
 
 let moods = {
-  "happy": "assets/icons8-happy-face-48.png",
-  "sad": "assets/icons8-crying-48.png"
+  "happy": "assets/happy.png",
+  "sad": "assets/sad.png",
+  "angry": "assets/angry.png",
+  "afraid": "assets/afraid.png",
+  "disgusted": "assets/disgusted.png",
+  "surprised": "assets/surprised.png"
+}
+
+for (const key in moods) {
+  const moodIcon = document.createElement("img");
+  moodIcon.className = "mood-icon"
+  moodIcon.setAttribute("src", moods[key])
+  moodSection.append(moodIcon)
+  document.querySelectorAll(".mood-icon");
 }
 
 function getLocation() {
@@ -46,13 +58,12 @@ function getMoods() {
 }
 
 // ---------------------------------------------------------------------------------------------
+const moodIcons = document.querySelectorAll(".mood-icon")
 
 document.addEventListener("DOMContentLoaded", (event) => {
   getMoods();
   getLocation();
 })
-
-
 
 moodIcons.forEach((item) => {
   
