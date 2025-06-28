@@ -22,7 +22,6 @@ for (const key in moods) {
 }
 
 function getLocation() {
-  
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(success, error);
   }
@@ -43,7 +42,6 @@ function error(error) {
 }
 
 function getMoods() {
-  
   fetch("http://localhost:3000/moods")
   .then(res => res.json())
   .then(data => {
@@ -52,7 +50,16 @@ function getMoods() {
         iconUrl: moods[mood.mood_name],
         iconSize: [20, 20]
       });
-      L.marker([mood.latitude, mood.longitude], { icon: icon }).addTo(map);
+      const marker = L.marker([mood.latitude, mood.longitude], { icon: icon, riseOnHover: true }).addTo(map).bindPopup(`<h1>${mood.mood_name}</h1><p>${mood.mood_description}</p>`);
+
+      marker.addEventListener("mouseover", e => {
+        marker.openPopup();
+      })
+
+      marker.addEventListener("mouseout", e => {
+        marker.closePopup();
+      })
+
     })
   })
 }
@@ -72,7 +79,7 @@ moodIcons.forEach((item) => {
     const currentMood = Object.keys(moods).find((key) => moods[key] === iconPath);
     const icon = L.icon({
       iconUrl: iconPath,
-      iconSize: [20, 20]
+      iconSize: [35, 35]
     });
 
     let formDiv = document.getElementById("form-div");
