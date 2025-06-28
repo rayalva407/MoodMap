@@ -1,4 +1,4 @@
-const map = L.map('map').setView([30, 0], 4);
+const map = L.map('map').setView([30, 0], 3);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
 const err = document.querySelector("#error");
 const moodSection = document.querySelector("#mood-section")
@@ -34,7 +34,7 @@ function getLocation() {
 
 function success(position) {  
   currentLocation = [position.coords.latitude, position.coords.longitude]
-  map.setView(currentLocation, 17);
+  map.setView(currentLocation, 16);
 }
   
 function error(error) {
@@ -50,7 +50,9 @@ function getMoods() {
         iconUrl: moods[mood.mood_name],
         iconSize: [20, 20]
       });
-      const marker = L.marker([mood.latitude, mood.longitude], { icon: icon, riseOnHover: true }).addTo(map).bindPopup(`<h1>${mood.mood_name}</h1><p>${mood.mood_description}</p>`);
+      const marker = L.marker([mood.latitude, mood.longitude], { icon: icon, riseOnHover: true })
+        .addTo(map)
+        .bindPopup(`<h3>${mood.mood_name}</h3><p>${mood.mood_description}</p>`, { closeButton: false, className: "popup" });
 
       marker.addEventListener("mouseover", e => {
         marker.openPopup();
@@ -75,11 +77,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
 moodIcons.forEach((item) => {
   
   item.addEventListener('click', () => {
+    // item.style.backgroundColor = "blue"; TODO
     const iconPath = item.getAttribute("src");
     const currentMood = Object.keys(moods).find((key) => moods[key] === iconPath);
     const icon = L.icon({
       iconUrl: iconPath,
-      iconSize: [35, 35]
+      iconSize: [25, 25]
     });
 
     let formDiv = document.getElementById("form-div");
@@ -98,7 +101,7 @@ moodIcons.forEach((item) => {
     let moodDescription = "";
 
     submitButton.textContent = "Submit";
-    descriptionTitle.innerText = "Tell us why you are feeling this way";
+    descriptionTitle.innerText = "Why you are feeling this way?";
     bodyElement.appendChild(formDiv);
     formDiv.appendChild(descriptionTitle);
     formDiv.appendChild(descriptionInput);
