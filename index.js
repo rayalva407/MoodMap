@@ -18,7 +18,7 @@ for (const key in moods) {
   moodIcon.className = "mood-icon"
   moodIcon.setAttribute("src", moods[key])
   moodSection.append(moodIcon)
-  document.querySelectorAll(".mood-icon");
+  // document.querySelectorAll(".mood-icon");
 }
 
 function getLocation() {
@@ -52,7 +52,7 @@ function getMoods() {
       });
       const marker = L.marker([mood.latitude, mood.longitude], { icon: icon, riseOnHover: true })
         .addTo(map)
-        .bindPopup(`<h3>${mood.mood_name}</h3><p>${mood.mood_description}</p>`, { closeButton: false, className: "popup" });
+        .bindPopup(`<h3>${mood.mood_name[0].toUpperCase() + mood.mood_name.substring(1)}</h3><p>${mood.mood_description}</p>`, { closeButton: false, className: "popup" });
 
       marker.addEventListener("mouseover", e => {
         marker.openPopup();
