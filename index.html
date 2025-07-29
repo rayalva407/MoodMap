@@ -12,11 +12,32 @@
     </script>
 </head>
 <body>
-  <h1 id="title">Mood Map</h1>
-  <h3 id="error"></h3>
-  <div id="map"></div>
-  <div id="mood-section">
-  </div>
+  <header>
+        <h1 id="title">Mood Map</h1>
+        <p class="tagline">Share your feelings with the world</p>
+        <h3 id="error"></h3>
+    </header>
+    
+    <div class="content-wrapper">
+        <div class="instructions">
+            <p>Select your current mood, then share why you're feeling that way. Your anonymous mood will appear on the map for others to see.</p>
+        </div>
+        
+        <div class="map-container">
+            <div class="loader">
+                <div class="spinner"></div>
+            </div>
+            <div id="map"></div>
+        </div>
+        
+        <div class="controls-section">
+            <div id="mood-section"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Mood Map &copy; 2023 | Share your emotions anonymously</p>
+    </footer>
 
   <script src="index.js" async defer></script>
 </body>
