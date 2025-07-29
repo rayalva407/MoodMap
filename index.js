@@ -42,7 +42,7 @@ function error(error) {
 }
 
 function getMoods() {
-  fetch("http://localhost:3000/moods")
+  fetch("https://safe-cliffs-04944-45eff5e74913.herokuapp.com/moods")
   .then(res => res.json())
   .then(data => {
     data.forEach(mood => {
@@ -114,7 +114,7 @@ moodIcons.forEach((item) => {
     submitButton.addEventListener('click', () => {
       L.marker(currentLocation, {icon: icon}).addTo(map);
 
-      fetch("http://localhost:3000/moods", {
+      fetch("https://safe-cliffs-04944-45eff5e74913.herokuapp.com/moods", {
         method: "POST",
         body: JSON.stringify({
           mood_name: currentMood,
