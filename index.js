@@ -1,13 +1,71 @@
 const map = L.map('map').setView([30, 0], 3);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  detectRetina: true
 }).addTo(map);
 
 const err = document.querySelector("#error");
 const moodSection = document.querySelector("#mood-section");
 const loader = document.querySelector(".loader");
 let currentLocation;
+const locateBtn = document.getElementById('locate-btn');
+const permissionPrompt = document.getElementById('permission-prompt');
+const enableLocationBtn = document.getElementById('enable-location');
+const cancelLocationBtn = document.getElementById('cancel-location');
+let locationPermissionRequested = false;
+
+function isAppleDevice() {
+  if (navigator.userAgentData) {
+    return navigator.userAgentData.brands.some(brand =>
+      brand.brand.includes('Apple') ||
+      brand.brand.includes('Safari')
+    );
+  }
+
+  const ua = navigator.userAgent;
+  return /(iPhone|iPod|iPad|Macintosh|Mac OS X)/i.test(ua);
+}
+
+function isIOS() {
+  if (!isAppleDevice()) return false;
+
+  const isTouchDevice = 'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0 ||
+    (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints > 0);
+
+  const ua = navigator.userAgent;
+  const isIPhone = /iPhone|iPod/i.test(ua);
+  const isIPad = /iPad/i.test(ua);
+
+  const isDesktopIPad = /Macintosh/i.test(ua) && isTouchDevice;
+
+  return isIPhone || isIPad || isDesktopIPad;
+}
+
+
+function isMacOS() {
+  if (!isAppleDevice()) return false;
+
+  const ua = navigator.userAgent;
+  const isMac = /Macintosh|Mac OS X/i.test(ua);
+
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  return isMac && !isTouchDevice;
+}
+
+function fixAppleMapRendering() {
+  if (isIOS() || isMacOS()) {
+    // Use requestAnimationFrame for better timing
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+      requestAnimationFrame(() => {
+        map.invalidateSize();
+      });
+    });
+  }
+}
 
 // Mood icons
 let moods = {
@@ -32,23 +90,92 @@ for (const key in moods) {
 // Get user location
 function getLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(success, error);
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+    loader.style.display = "block";
+
+    navigator.geolocation.getCurrentPosition(
+      success,
+      error,
+      options
+    );
   } else {
     err.innerHTML = "Geolocation is not supported by this browser.";
+    loader.style.display = "none";
+
+    if (isIOS()) {
+      err.innerHTML += " Please enable location services in Settings > Privacy.";
+    }
   }
 }
 
 function success(position) {
   currentLocation = [position.coords.latitude, position.coords.longitude];
   map.setView(currentLocation, 13);
+  loader.style.display = "none";
 }
 
 function error(error) {
-  err.innerHTML = "Please allow location permission to add a marker to the mood map";
+  loader.style.display = "none";
+
+  if (isIOS()) {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        err.innerHTML = "Location permission denied. Please enable it in Settings > Privacy > Location Services.";
+        break;
+      case error.POSITION_UNAVAILABLE:
+        err.innerHTML = "Location services are unavailable on this iOS device.";
+        break;
+      case error.TIMEOUT:
+        err.innerHTML = "Location request timed out. Please check your internet connection.";
+        break;
+      default:
+        err.innerHTML = "Location error on iOS device.";
+    }
+    return;
+  }
+
+  if (isMacOS()) {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        err.innerHTML = "Location permission denied. Please check Safari preferences.";
+        break;
+      default:
+        err.innerHTML = "Location error on macOS.";
+    }
+    return;
+  }
+
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      err.innerHTML = "Location permission denied.";
+      break;
+    case error.POSITION_UNAVAILABLE:
+      err.innerHTML = "Location information unavailable.";
+      break;
+    case error.TIMEOUT:
+      err.innerHTML = "Location request timed out.";
+      break;
+    case error.UNKNOWN_ERROR:
+      err.innerHTML = "Unknown location error.";
+      break;
+  }
+}
+
+function showPermissionPrompt() {
+  permissionPrompt.style.display = "flex";
+}
+
+function hidePermissionPrompt() {
+  permissionPrompt.style.display = "none";
 }
 
 // Load existing moods
 function getMoods() {
+  loader.style.display = "block";
   fetch("https://safe-cliffs-04944-45eff5e74913.herokuapp.com/moods")
     .then(res => res.json())
     .then(data => {
@@ -61,6 +188,8 @@ function getMoods() {
           .addTo(map)
           .bindPopup(`<h3>${mood.mood_name[0].toUpperCase() + mood.mood_name.substring(1)}</h3><p>${mood.mood_description}</p>`, { closeButton: false, className: "popup" });
 
+        loader.style.display = "none";
+
         marker.addEventListener("mouseover", e => {
           marker.openPopup();
         })
@@ -71,16 +200,68 @@ function getMoods() {
 
       })
     })
+    .catch(error => {
+      console.error('Error fetching moods:', error);
+      err.innerHTML = "Failed to load mood data";
+      loader.style.display = "none";
+    });
 }
 
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", (event) => {
+  if (isIOS()) {
+    document.body.classList.add('ios-device');
+  }
+  else if (isMacOS()) {
+    document.body.classList.add('macos-device');
+  }
+
+  // Fix iOS map rendering issues
+  fixAppleMapRendering();
+
+  // Load data
   getMoods();
-  getLocation();
+
+  // Get location after a short delay
+  setTimeout(() => {
+    getLocation();
+  }, 500);
+
+  // Add event listeners for permission buttons
+  enableLocationBtn.addEventListener('click', () => {
+    hidePermissionPrompt();
+    getLocation();
+  });
+
+  cancelLocationBtn.addEventListener('click', hidePermissionPrompt);
 });
 
-// Mood selection functionality
 const moodIcons = document.querySelectorAll(".mood-icon");
+
+locateBtn.addEventListener('click', () => {
+  if (isIOS()) {
+    loader.style.display = "block";
+  }
+
+  if (currentLocation) {
+    map.setView(currentLocation, 13);
+  } else {
+    getLocation();
+  }
+
+  // Additional iOS fix
+  if (isIOS()) {
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 300);
+  }
+});
+
+document.addEventListener('focusin', function () {
+  if (isIOS()) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
 
 moodIcons.forEach((item) => {
   item.addEventListener('click', () => {
@@ -176,6 +357,13 @@ moodIcons.forEach((item) => {
           className: "popup",
           maxWidth: 250
         });
+
+      if (isIOS() || isMacOS()) {
+        // Force map re-render on iOS after adding marker
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 300);
+      }
 
       marker.addEventListener("mouseover", e => {
         marker.openPopup();

@@ -7,15 +7,18 @@
             --light: #ecf0f1;
             --gray: #95a5a6;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
+            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -23,7 +26,7 @@
             color: var(--dark);
             line-height: 1.6;
         }
-        
+
         header {
             text-align: center;
             padding: 20px 15px 10px;
@@ -32,7 +35,7 @@
             z-index: 1000;
             width: 100%;
         }
-        
+
         #title {
             font-size: clamp(2.2rem, 6vw, 3.5rem);
             margin: 0;
@@ -42,14 +45,14 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
         }
-        
+
         .tagline {
             font-size: clamp(0.95rem, 2.5vw, 1.2rem);
             color: var(--gray);
             margin: 5px 0 10px;
             font-weight: 500;
         }
-        
+
         #error {
             color: var(--danger);
             font-weight: 600;
@@ -58,7 +61,7 @@
             min-height: 24px;
             font-size: clamp(0.9rem, 3vw, 1rem);
         }
-        
+
         .content-wrapper {
             display: flex;
             flex-direction: column;
@@ -68,8 +71,9 @@
             margin: 0 auto;
             padding: 15px;
         }
-        
+
         .map-container {
+            position: relative;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -79,13 +83,87 @@
             margin-bottom: 20px;
             min-height: 300px;
         }
-        
+
         #map {
+            -webkit-backface-visibility: hidden;
+            transform: translateZ(0);
             flex: 1;
             width: 100%;
             z-index: 10;
         }
-        
+
+        #locate-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            -webkit-appearance: none;
+        }
+
+        .permission-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .permission-box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .permission-box h3 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .permission-box p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .permission-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+
+        .permission-btn.secondary {
+            background: var(--gray);
+        }
+
+
         .controls-section {
             display: flex;
             flex-direction: column;
@@ -93,7 +171,7 @@
             padding: 0 10px;
             width: 100%;
         }
-        
+
         #mood-section {
             display: flex;
             flex-wrap: wrap;
@@ -107,7 +185,7 @@
             width: 100%;
             max-width: 800px;
         }
-        
+
         .mood-icon {
             width: clamp(45px, 9vw, 65px);
             height: clamp(45px, 9vw, 65px);
@@ -117,20 +195,22 @@
             padding: 6px;
             background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            -webkit-user-select: none;
+            user-select: none;
         }
-        
+
         .mood-icon:hover {
             transform: scale(1.12);
             background: rgba(255, 255, 255, 1);
             box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
         }
-        
+
         .mood-icon.active {
             transform: scale(1.15);
             background: var(--primary);
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.6);
         }
-        
+
         #form-div {
             display: flex;
             flex-direction: column;
@@ -144,14 +224,14 @@
             margin: 10px 0 20px;
             z-index: 1000;
         }
-        
+
         #form-div h3 {
             margin-bottom: 18px;
             text-align: center;
             color: var(--dark);
             font-size: clamp(1.15rem, 3.5vw, 1.4rem);
         }
-        
+
         #form-div textarea {
             width: 100%;
             height: 110px;
@@ -163,14 +243,15 @@
             font-size: 1rem;
             resize: vertical;
             transition: border 0.3s;
+            -webkit-appearance: none;
         }
-        
+
         #form-div textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
-        
+
         #form-div button {
             background: var(--primary);
             color: white;
@@ -184,25 +265,26 @@
             width: 100%;
             max-width: 200px;
             box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+            -webkit-appearance: none;
         }
-        
+
         #form-div button:hover {
             background: #2980b9;
             transform: translateY(-2px);
             box-shadow: 0 5px 12px rgba(52, 152, 219, 0.4);
         }
-        
+
         #form-div .btn-cancel {
             background: var(--danger);
             margin-top: 10px;
             box-shadow: 0 3px 8px rgba(231, 76, 60, 0.3);
         }
-        
+
         #form-div .btn-cancel:hover {
             background: #c0392b;
             box-shadow: 0 5px 12px rgba(231, 76, 60, 0.4);
         }
-        
+
         .instructions {
             text-align: center;
             max-width: 700px;
@@ -212,7 +294,7 @@
             color: var(--gray);
             line-height: 1.7;
         }
-        
+
         footer {
             text-align: center;
             padding: 20px 15px;
@@ -222,34 +304,34 @@
             margin-top: auto;
             width: 100%;
         }
-        
+
         /* Popup styling */
         .leaflet-popup-content-wrapper {
             border-radius: 10px;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
-        
+
         .leaflet-popup-content {
             margin: 12px;
             text-align: center;
             font-size: 1rem;
         }
-        
+
         .leaflet-popup-content h3 {
             color: var(--primary);
             margin-bottom: 5px;
         }
-        
+
         /* Loading spinner */
         .loader {
             display: none;
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1001;
         }
-        
+
         .spinner {
             width: 40px;
             height: 40px;
@@ -258,60 +340,131 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        /* iOS-specific styles */
+        .ios-device .map-container {
+            border-radius: 0;
+            box-shadow: none;
         }
-        
+
+        .ios-device body {
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .ios-device #map {
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+        }
+
+        /* macOS-specific styles */
+        .macos-device #map {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Apple form elements */
+        .ios-device #form-div textarea,
+        .macos-device #form-div textarea,
+        .ios-device #form-div button,
+        .macos-device #form-div button {
+            -webkit-appearance: none;
+            border-radius: 8px;
+        }
+
+        /* Safari scrollbars */
+        .ios-device ::-webkit-scrollbar,
+        .macos-device ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .ios-device ::-webkit-scrollbar-thumb,
+        .macos-device ::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* iOS loader positioning fix */
+        .ios-device .loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .map-container {
                 border-radius: 12px;
             }
-            
+
             #mood-section {
                 padding: 10px 0;
                 border-radius: 40px;
                 gap: 10px;
             }
-            
+
             .mood-icon {
                 width: clamp(40px, 10vw, 55px);
                 height: clamp(40px, 10vw, 55px);
             }
-            
+
             #form-div {
                 padding: 18px;
             }
         }
-        
+
         @media (max-width: 480px) {
             header {
                 padding: 15px 10px 5px;
             }
-            
+
             .content-wrapper {
                 padding: 10px;
             }
-            
+
             #mood-section {
                 border-radius: 35px;
                 gap: 8px;
                 padding: 8px 0;
             }
-            
+
             .mood-icon {
                 width: 42px;
                 height: 42px;
             }
-            
+
             #form-div {
                 padding: 15px;
             }
-            
+
             #form-div textarea {
                 height: 90px;
                 padding: 12px;
+            }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            .map-container {
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            body {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+
+            #map {
+                -webkit-mask-image: -webkit-radial-gradient(white, black);
             }
         }
