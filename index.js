@@ -43,6 +43,9 @@ function isIOS() {
   return isIPhone || isIPad || isDesktopIPad;
 }
 
+function isSafari() {
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
 
 function isMacOS() {
   if (!isAppleDevice()) return false;
@@ -97,6 +100,11 @@ function getLocation() {
     };
     loader.style.display = "block";
 
+    if (isSafari() && isMacOS()) {
+      showMacPermissionPrompt();
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       success,
       error,
@@ -112,10 +120,48 @@ function getLocation() {
   }
 }
 
+function showMacPermissionPrompt() {
+  const permissionPrompt = document.createElement('div');
+  permissionPrompt.id = 'mac-permission-prompt';
+  permissionPrompt.innerHTML = `
+        <div class="permission-box">
+            <h3>Location Permission Required</h3>
+            <p>Mood Map needs access to your location to place your mood on the map.</p>
+            <p>Please click "Allow" and then grant permission in the Safari prompt.</p>
+            <button id="mac-enable-location">Allow Location</button>
+        </div>
+    `;
+  document.body.appendChild(permissionPrompt);
+
+  document.getElementById('mac-enable-location').addEventListener('click', () => {
+    permissionPrompt.remove();
+
+    // Now request location after user interaction
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      success,
+      error,
+      options
+    );
+  });
+}
+
 function success(position) {
   currentLocation = [position.coords.latitude, position.coords.longitude];
   map.setView(currentLocation, 13);
   loader.style.display = "none";
+
+  if (isSafari()) {
+    setTimeout(() => {
+      map.invalidateSize();
+      setTimeout(() => map.invalidateSize(), 300);
+    }, 500)
+  }
 }
 
 function error(error) {
@@ -137,6 +183,24 @@ function error(error) {
     }
     return;
   }
+
+  if (isSafari() && isMacOS()) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                err.innerHTML = "Location permission denied. Please enable it in Safari preferences > Websites > Location.";
+                break;
+            case error.POSITION_UNAVAILABLE:
+                err.innerHTML = "Location services unavailable. Please ensure Location Services is enabled in System Preferences.";
+                break;
+            case error.TIMEOUT:
+                err.innerHTML = "Location request timed out. Please check your internet connection.";
+                break;
+            case error.UNKNOWN_ERROR:
+                err.innerHTML = "Unknown location error. Please try again.";
+                break;
+        }
+        return;
+    }
 
   if (isMacOS()) {
     switch (error.code) {

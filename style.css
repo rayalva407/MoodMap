@@ -370,6 +370,15 @@
             border-radius: 8px;
         }
 
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 4px;
+        }
+
         /* Safari scrollbars */
         .ios-device ::-webkit-scrollbar,
         .macos-device ::-webkit-scrollbar {
@@ -389,6 +398,32 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1001;
+        }
+
+        #mac-permission-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #mac-enable-location {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0 5px;
         }
 
         @keyframes spin {
